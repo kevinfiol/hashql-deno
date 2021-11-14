@@ -1,8 +1,17 @@
-import { serve } from "https://deno.land/std@0.114.0/http/server.ts";
+const server = Deno.listen({ port: 8000 });
 
-function handler(req) {
-  return new Response("Hello world");
+async function handle(conn) {
+  const httpConn = Deno.serveHttp(conn);
+  for await (const requestEvent of httpConn) {
+    // const url = new URL(requestEvent.request.url);
+    await requestEvent.respondWith(
+      new Response("hello world", {
+        status: 200,
+      }),
+    );
+  }
 }
 
-console.log("Listening on http://localhost:8000");
-await serve(handler);
+for await (const conn of server) {
+  handle(conn);
+}
